@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "module": "ESNext",
+      "target": "ES6",
+      "moduleResolution": "node",
+      "checkJs": true
+    },
+    "include": ["src/**/*"]
+  }
