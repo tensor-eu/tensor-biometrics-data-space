@@ -1,0 +1,247 @@
+{
+  "components": [
+    {
+      "label": "Case ID",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1otd65r",
+        "columns": null
+      },
+      "id": "Field_0r2wv2v",
+      "key": "businessKey",
+      "validate": {
+        "required": false
+      },
+      "readonly": false
+    },
+    {
+      "label": "Use case template",
+      "type": "number",
+      "layout": {
+        "row": "Row_1uzpgdj",
+        "columns": null
+      },
+      "id": "Field_1oc0szq",
+      "key": "uc_template",
+      "validate": {
+        "required": true,
+        "min": 1,
+        "max": 3
+      },
+      "defaultValue": 1,
+      "decimalDigits": 0,
+      "increment": "1",
+      "disabled": false,
+      "readonly": false
+    },
+    {
+      "components": [
+        {
+          "label": "Officer",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0208umd",
+            "columns": null
+          },
+          "id": "Field_1u6eiqu",
+          "key": "by",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "label": "role",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0bph72k",
+            "columns": null
+          },
+          "id": "Field_15teo3b",
+          "key": "role"
+        },
+        {
+          "label": "Country",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_1b3jex4",
+            "columns": null
+          },
+          "id": "Field_19h6r68",
+          "key": "country",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "label": "Agency",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_1t2wy0k",
+            "columns": null
+          },
+          "id": "Field_1jq1rrv",
+          "key": "agency"
+        },
+        {
+          "label": "Criminal case number",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0twz0ab",
+            "columns": null
+          },
+          "id": "Field_14gxcvl",
+          "key": "ccn",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "subtype": "datetime",
+          "dateLabel": "Date",
+          "label": "Date time",
+          "type": "datetime",
+          "layout": {
+            "row": "Row_0x4ligc",
+            "columns": null
+          },
+          "id": "Field_1r9p4vu",
+          "key": "date",
+          "validate": {
+            "required": true
+          },
+          "timeLabel": "Time",
+          "timeSerializingFormat": "utc_offset",
+          "timeInterval": 1,
+          "disallowPassedDates": false,
+          "readonly": "=false",
+          "use24h": true,
+          "properties": {}
+        }
+      ],
+      "showOutline": true,
+      "label": "Submission",
+      "type": "group",
+      "layout": {
+        "row": "Row_0gsww1j",
+        "columns": null
+      },
+      "id": "Field_0274bcj",
+      "path": "submission"
+    },
+    {
+      "components": [
+        {
+          "label": "Type",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_098snza",
+            "columns": null
+          },
+          "id": "Field_05tedxi",
+          "key": "type",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "subtype": "datetime",
+          "dateLabel": "Date",
+          "label": "Date time",
+          "type": "datetime",
+          "layout": {
+            "row": "Row_0nwtwko",
+            "columns": null
+          },
+          "id": "Field_0994uk0",
+          "key": "date",
+          "validate": {
+            "required": true
+          },
+          "timeLabel": "Time",
+          "timeSerializingFormat": "utc_offset",
+          "timeInterval": 15
+        },
+        {
+          "label": "Address",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0h1971g",
+            "columns": null
+          },
+          "id": "Field_08o0wvx",
+          "key": "address",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "label": "City",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_1uf41sg",
+            "columns": null
+          },
+          "id": "Field_0f3u4xy",
+          "key": "city",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "label": "Postal Code",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_162w81q",
+            "columns": null
+          },
+          "id": "Field_0zf767m",
+          "key": "postal_code",
+          "validate": {
+            "pattern": "^[a-z0-9][a-z0-9\\- ]{0,10}[a-z0-9]$"
+          }
+        },
+        {
+          "label": "Country",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0j34hsl",
+            "columns": null
+          },
+          "id": "Field_0ohgfyd",
+          "key": "country"
+        },
+        {
+          "label": "Description",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0kw52k7",
+            "columns": null
+          },
+          "id": "Field_0lgb59d",
+          "key": "description",
+          "validate": {
+            "required": false
+          }
+        }
+      ],
+      "showOutline": true,
+      "label": "Incident",
+      "type": "group",
+      "layout": {
+        "row": "Row_0j9q845",
+        "columns": null
+      },
+      "id": "Field_0kumxpz",
+      "path": "incident"
+    }
+  ],
+  "type": "default",
+  "id": "form_1",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.24.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
+}

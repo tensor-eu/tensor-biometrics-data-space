@@ -1,0 +1,128 @@
+{
+  "components": [
+    {
+      "components": [
+        {
+          "components": [
+            {
+              "label": "Id",
+              "type": "number",
+              "layout": {
+                "row": "Row_1bhcamv",
+                "columns": null
+              },
+              "id": "Field_1c3jag6",
+              "key": "id",
+              "validate": {
+                "required": true
+              },
+              "increment": "1",
+              "defaultValue": 1,
+              "decimalDigits": 0
+            },
+            {
+              "values": [
+                {
+                  "label": "Physical",
+                  "value": "physical"
+                },
+                {
+                  "label": "Photo",
+                  "value": "photo"
+                },
+                {
+                  "label": "Video",
+                  "value": "video"
+                },
+                {
+                  "label": "Audio",
+                  "value": "audio"
+                }
+              ],
+              "label": "Type",
+              "type": "select",
+              "layout": {
+                "row": "Row_136mrm5",
+                "columns": null
+              },
+              "id": "Field_07fxemf",
+              "key": "type",
+              "defaultValue": "value",
+              "validate": {
+                "required": true
+              }
+            },
+            {
+              "subtype": "date",
+              "dateLabel": "Submitted At",
+              "label": "Date time",
+              "type": "datetime",
+              "layout": {
+                "row": "Row_08e4g9k",
+                "columns": null
+              },
+              "id": "Field_0klnw4l",
+              "key": "date",
+              "validate": {
+                "required": true
+              }
+            },
+            {
+              "label": "Url",
+              "type": "textfield",
+              "layout": {
+                "row": "Row_175qvy0",
+                "columns": null
+              },
+              "id": "Field_1821ixi",
+              "key": "url",
+              "validate": {
+                "pattern": "^((https?|ftp|smtp):\\/\\/)?(www.)?[a-z0-9]+\\.[a-z]+(\\/[a-zA-Z0-9#]+\\/?)*$"
+              }
+            },
+            {
+              "label": "Description",
+              "type": "textfield",
+              "layout": {
+                "row": "Row_1a68h5q",
+                "columns": null
+              },
+              "id": "Field_01jia1s",
+              "key": "description"
+            }
+          ],
+          "showOutline": true,
+          "label": "Piece of evidence",
+          "type": "group",
+          "layout": {
+            "row": "Row_1xcjxd4",
+            "columns": 16
+          },
+          "id": "Field_148goa1",
+          "properties": {}
+        }
+      ],
+      "showOutline": true,
+      "isRepeating": true,
+      "allowAddRemove": true,
+      "defaultRepetitions": 1,
+      "label": "Evidence",
+      "type": "dynamiclist",
+      "layout": {
+        "row": "Row_0qnotl5",
+        "columns": null
+      },
+      "id": "Field_11julwl",
+      "path": "evidence"
+    }
+  ],
+  "type": "default",
+  "id": "form_2",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.24.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.21.0",
+  "schemaVersion": 16
+}
