@@ -1,0 +1,51 @@
+services:
+  reverse-proxy:
+    build: ./reverseProxy
+    image: harbor.tensor.rid-intrasoft.eu/tel_registry/nginx-reverse-proxy:${DOCKER_TAG}
+    container_name: reverse-proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - ui-case-manage-server
+    restart: always
+  redis:
+    image: "redis:7.4.2"
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - ui-case-manage-server
+    labels:
+      io.portainer.accesscontrol.teams: TEL
+  camunda:
+    image: camunda/camunda-bpm-platform:run-7.22.0
+    ports:
+      - "${CAMUNDA_PORT}:8080"
+    volumes:
+      - ./src/main/resources:/camunda/configuration/resources
+    networks:
+      - ui-case-manage-server
+    labels:
+      io.portainer.accesscontrol.teams: TEL
+  api:
+    build: ./cmsAPI
+    image: harbor.tensor.rid-intrasoft.eu/tel_registry/case-management-system:${DOCKER_TAG}
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    env_file:
+      - ./cmsAPI/api.env
+    volumes:
+      - ./cmsAPI/uploads:/usr/src/app/uploads
+    networks:
+      - ui-case-manage-server
+    labels:
+      io.portainer.accesscontrol.teams: TEL
+networks:
+  ui-case-manage-server:
+    external: true
+volumes:
+  sqlite_data:

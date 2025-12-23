@@ -1,0 +1,1221 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Tensor Case Management System API",
+    "version": "1.0.0",
+    "license": {
+      "name": "Licensed Under EUPL-1.2",
+      "url": "https://spdx.org/licenses/EUPL-1.2.html"
+    }
+  },
+  "paths": {
+    "/api/cases/": {
+      "post": {
+        "summary": "Create a new criminal case in the case management system",
+        "tags": ["cases"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/newCase" }
+            }
+          }
+        },
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "responses": {
+          "201": {
+            "description": "An object containing the businessKey (external ID) of the new case",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "businessKey": {
+                      "type": "string",
+                      "format": "uuid-v4",
+                      "example": "12345678-1234-1234-1234-1234567890ab",
+                      "description": "Used to perform search operations on the case"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all the cases from the CMS",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "example": 0,
+            "description": "The zero-indexed number of page to request for paginated results",
+            "schema": { "type": "number", "minimum": 0 }
+          },
+          {
+            "name": "itemsPerPage",
+            "in": "query",
+            "required": false,
+            "example": 10,
+            "description": "The number of individual cases per page to include for paginated results",
+            "schema": { "type": "number", "minimum": 1 }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "example": "title_like_%test%",
+            "description": "Only include cases that have variables with certain values. Variable filtering expressions are comma-separated and are structured as follows. A valid parameter value has the form key_operator_value. key is the variable name, operator is the comparison operator to be used and value the variable value. ONLY USE root level variables e.g. title. Valid operator values are:eq - equal to; neq - not equal to; gt - greater than; gteq - greater than or equal to; lt - lower than; lteq - lower than or equal to; like - As in SQL. key and value may not contain underscore or comma characters.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array containing every case",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/case" }
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}": {
+      "get": {
+        "summary": "Retrieve a single case based on the unique businessKey",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case to retrieve",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array containing every case",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/case" }
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error404" }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a single case based on the unique businessKey",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique if of the case to delete",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted!" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update the case variables without advancing a step - USE WITH CAUTION",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case to update the variables",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/newCase" }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Updated!" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}/evidence": {
+      "post": {
+        "summary": "Upload file evidence to a case",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case to upload the evidence to",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "descriptions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "textual description of the piece of evidence",
+                      "example": "Bank video showing acts of terrorism"
+                    }
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": { "type": "string", "example": "voice" }
+                  },
+                  "titles": {
+                    "type": "array",
+                    "items": { "type": "string", "example": "title" }
+                  },
+                  "sources": {
+                    "type": "array",
+                    "items": { "type": "string", "example": "source" }
+                  },
+                  "comments": {
+                    "type": "array",
+                    "items": { "type": "string", "example": "comment" }
+                  },
+                  "datetimes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "2025-09-01T00:00:00.000Z"
+                    }
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "binary" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Updated!" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}/evidence/{evidenceId}": {
+      "get": {
+        "summary": "Retrieve a single evidence file",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case containing the evidence",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          },
+          {
+            "name": "evidenceId",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique id of the evidence file",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "The Requested piece of evidence as a file" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a single evidence file",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case containing the evidence",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          },
+          {
+            "name": "evidenceId",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique id of the evidence file to delete",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "205": { "description": "Deleted!" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}/close": {
+      "put": {
+        "summary": "Mark a case as closed",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case to close",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Updated!" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}/advance": {
+      "post": {
+        "summary": "Advance a single step in a case. USE WITH CAUTION",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["cases"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case to close",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          },
+          {
+            "name": "step",
+            "in": "query",
+            "required": true,
+            "example": 3,
+            "description": "The number of the step to advance"
+          },
+          {
+            "name": "template",
+            "in": "query",
+            "required": true,
+            "example": "uc_3",
+            "description": "The use-case template of the case"
+          }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object" } } }
+        },
+        "responses": {
+          "204": { "description": "Updated!" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/history/": {
+      "get": {
+        "summary": "Retrieve all the closed cases from the CMS",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["history"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "example": 0,
+            "description": "The zero-indexed number of page to request for paginated results",
+            "schema": { "type": "number", "minimum": 0 }
+          },
+          {
+            "name": "itemsPerPage",
+            "in": "query",
+            "required": false,
+            "example": 10,
+            "description": "The number of individual cases per page to include for paginated results",
+            "schema": { "type": "number", "minimum": 1 }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "example": "title_like_%test%",
+            "description": "Only include cases that have variables with certain values. Variable filtering expressions are comma-separated and are structured as follows. A valid parameter value has the form key_operator_value. key is the variable name, operator is the comparison operator to be used and value the variable value. ONLY USE root level variables e.g. title. Valid operator values are:eq - equal to; neq - not equal to; gt - greater than; gteq - greater than or equal to; lt - lower than; lteq - lower than or equal to; like - As in SQL. key and value may not contain underscore or comma characters.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array containing every closed case based on the fitering results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/case" }
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/history/{businessKey}": {
+      "get": {
+        "summary": "Retrieve a single closed case based on the unique businessKey",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["history"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case to retrieve",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array containing every case",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/case" }
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error404" }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a single closed case based on the unique businessKey",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["history"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique if of the case to delete",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted!" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/history/{businessKey}/evidence/{evidenceId}": {
+      "get": {
+        "summary": "Retrieve a single evidence file from a closed case",
+        "tags": ["history"],
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the case containing the evidence",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          },
+          {
+            "name": "evidenceId",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique id of the evidence file",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "The Requested piece of evidence as a file" },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/cases/{businessKey}/match": {
+      "post": {
+        "summary": "Request a biometrics match, as part of UC3 flow",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["use case 3"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the relevant case",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/uc3MatchObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "An array of matching scores for each biometric modality found in each connector that participates in the Data Space",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/uc3MatchObject" }
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error404" }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}/dsp-request": {
+      "post": {
+        "summary": "Request the creation of a dataRequest, as part of UC3 flow",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["use case 3"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the relevant case",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/uc3RequestObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The hex data of the dataRequest, ready to be signed by the end user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "8998436035900000000000003288372852852528"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error404" }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/receive-dsp-response": {
+      "post": {
+        "summary": "Receive a signed & deployed response from the data onwer's connector, as part of UC3 flow",
+        "tags": ["use case 3"],
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "string",
+                    "example": "0x8998436035900000000000003288372852852528",
+                    "description": "The hex data of the received dataResponse transaction that was signed by the owner"
+                  },
+                  "from": {
+                    "type": "string",
+                    "example": "0x8998436035900000000000003288372852852528",
+                    "description": "The ethereum address of the data owner who signed the transaction"
+                  },
+                  "to": {
+                    "type": "string",
+                    "example": "0x8998436035900000000000003288372852852528",
+                    "description": "The ethereum address of the data requestor who is granted access (or not) via the transaction"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The hex data of the dataResponse, ready to be signed by the end user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "8998436035900000000000003288372852852528"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error404" }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}/data-exchange": {
+      "post": {
+        "summary": "Proceed with the actual data exchange, as part of UC3",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["use case 3"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the relevant case",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/uc3DataExchangeObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The retrieved file from the data owner's dataspace connector",
+            "content": {
+              "application/json": {
+                "schema": { "type": "string", "format": "file" }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error404" }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{businessKey}/complete-analysis": {
+      "put": {
+        "summary": "Mark the completion of the internal analysis period, as part of UC3",
+        "security": [{ "BearerAuth": [] }, { "InternalWSAuth": [] }],
+        "tags": ["use case 3"],
+        "parameters": [
+          {
+            "name": "businessKey",
+            "in": "path",
+            "required": true,
+            "example": "12345678-1234-1234-1234-1234567890ab",
+            "description": "The unique businessKey of the relevant case",
+            "schema": { "type": "string", "format": "uuid-v4" }
+          }
+        ],
+        "responses": {
+          "205": {
+            "description": "A simple acknowledgement of the user's completion of the internal analysis step"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error404" }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/error500" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": { "type": "http", "scheme": "bearer" },
+      "InternalWSAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "schemas": {
+      "newCase": {
+        "type": "object",
+        "required": ["uc_template", "businessKey", "submission", "incident"],
+        "properties": {
+          "businessKey": {
+            "type": "object",
+            "readOnly": true,
+            "required": ["value"],
+            "properties": {
+              "value": {
+                "type": "integer",
+                "example": "b05b953e-a95b-463b-a818-5493473c6d12"
+              }
+            }
+          },
+          "title": {
+            "type": "object",
+            "required": ["value"],
+            "properties": {
+              "value": { "type": "string", "example": "Test case" }
+            }
+          },
+          "uc_template": {
+            "type": "object",
+            "required": ["value"],
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": ["uc_3"],
+                "example": "uc_3"
+              }
+            }
+          },
+          "submission": {
+            "type": "object",
+            "description": "A collection of fields pertaing to the recording of the case",
+            "required": ["value"],
+            "properties": {
+              "value": {
+                "type": "object",
+                "properties": {
+                  "by": {
+                    "type": "string",
+                    "description": "The name of the officer creating the new case",
+                    "example": "John Smith"
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "The role/rank of the officer creating the new case",
+                    "example": "officer"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "The country of the LEA creating the case",
+                    "example": "Greece"
+                  },
+                  "agency": {
+                    "type": "string",
+                    "description": "The name of the LEA creating the new case",
+                    "example": "Hellenic Police"
+                  },
+                  "ccn": {
+                    "type": "string",
+                    "description": "The criminal case number corresponding to the new case in the local case registry",
+                    "example": "Officer Name"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date and time this case was created, in RFC 3339 format",
+                    "example": "2024-07-10T11:15+03:00"
+                  }
+                }
+              }
+            }
+          },
+          "incident": {
+            "type": "object",
+            "description": "A collection of fields pertaining to the physical incident that led to the creation of the case",
+            "required": ["value"],
+            "properties": {
+              "value": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "The type of the recorded incident",
+                    "example": "robbery"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date and time this incident was recorded, in RFC 3339 format",
+                    "example": "2024-07-10T11:15+03:00"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "Wellington Avenue 22",
+                    "description": "The exact location where the incident took place"
+                  },
+                  "city": {
+                    "type": "string",
+                    "example": "Athens",
+                    "description": "The city/area where the incident took place"
+                  },
+                  "postal_code": {
+                    "type": "string",
+                    "example": "44 555",
+                    "description": "The postal code of the area where the incident took place"
+                  },
+                  "country": {
+                    "type": "string",
+                    "example": "Greece",
+                    "description": "The country where the incident took place"
+                  },
+                  "description": {
+                    "description": "A textual representation of the incident",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "case": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The internal ID of the task (current step) object (USE businessKey for case retrieval)",
+                "example": "1dad972d-226f-4247-ae79-81638a7e4eb9"
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the current step",
+                "example": "Step3: Request Face Analysis"
+              },
+              "created": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The date and time this specific step was triggered",
+                "example": "2024-08-21T12:08:13.830Z"
+              },
+              "processInstanceId": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The internal ID of the process (whole case) object associated with the task",
+                "example": "480299c6-74bd-4061-90aa-44d875303298"
+              }
+            }
+          },
+          "caseVars": { "$ref": "#/components/schemas/newCase" }
+        }
+      },
+      "evidence": {
+        "type": "object",
+        "description": "A collection of fields pertaining to the extra evidence (photos, videos, audio) associated with the case",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid-v4",
+                "readOnly": true,
+                "description": "The unique id of the piece of evidence",
+                "example": "12345678-1234-1234-1234-1234567890ab"
+              },
+              "date": {
+                "type": "string",
+                "format": "date-time",
+                "readOnly": true,
+                "description": "The date and time this piece of evidence was submitted, in RFC 3339 format",
+                "example": "2024-07-10T11:15+03:00"
+              },
+              "url": {
+                "type": "string",
+                "format": "url",
+                "readOnly": true,
+                "example": "http://test-server.com/path/to/file",
+                "description": "The url of the physical evidence file"
+              },
+              "description": {
+                "description": "A textual representation of the evidence",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "uc3MatchObject": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The connector ID of the data requestor LEA",
+            "example": "LEA_ID"
+          },
+          "faceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the uploaded face biometric to be matched against the indexer catalogue"
+          },
+          "voiceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the uploaded voice biometric to be matched against the indexer catalogue"
+          },
+          "fingerprintId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the uploaded fingerprint biometric to be matched against the indexer catalogue"
+          },
+          "faceScore": {
+            "type": "number",
+            "description": "The cosine similarity score of the matched face biometric to the original query, in the space of [0, 1]",
+            "example": 0.5673,
+            "minimum": 0,
+            "maximum": 1,
+            "readOnly": true
+          },
+          "voiceScore": {
+            "type": "number",
+            "description": "The cosine similarity score of the matched voice biometric to the original query, in the space of [0, 1]",
+            "example": 0.9985,
+            "minimum": 0,
+            "maximum": 1,
+            "readOnly": true
+          },
+          "fingerprintScore": {
+            "type": "number",
+            "description": "The cosine similarity score of the matched fingerprint biometric to the original query, in the space of [0, 1]",
+            "example": 0.79556,
+            "minimum": 0,
+            "maximum": 1,
+            "readOnly": true
+          }
+        }
+      },
+      "uc3RequestObject": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The connector ID of the data requestor LEA",
+            "example": "LEA_ID"
+          },
+          "to": {
+            "type": "string",
+            "description": "The connector ID of the data owner LEA",
+            "example": "LEA_ID"
+          },
+          "suspectProfileId": {
+            "type": "string",
+            "description": "The supesct profile ID the request pertains to, returned from the /match endpoint",
+            "example": 1098907
+          },
+          "faceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the uploaded face biometric to be submitted to the data owner for verification"
+          },
+          "voiceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the uploaded voice biometric to be submitted to the data owner for verification"
+          },
+          "fingerprintId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the uploaded fingerprint biometric to be submitted to the data owner for verification"
+          }
+        }
+      },
+      "uc3DataExchangeObject": {
+        "type": "object",
+        "properties": {
+          "suspectProfileId": {
+            "type": "string",
+            "description": "The id of the suspect profile to be retrieved",
+            "example": 1098907
+          },
+          "to": {
+            "type": "string",
+            "enum": ["PROVIDER_CONNECTOR_ID", "CONSUMER_CONNECTOR_ID"],
+            "description": "The data onwer's connector id",
+            "example": "PROVIDER_CONNECTOR_ID"
+          }
+        }
+      },
+      "silhouetteAnalysisResponse": {
+        "type": "object",
+        "properties": {
+          "evidence_id": {
+            "type": "string",
+            "description": "The CMS id of the requested video"
+          },
+          "person_id": {
+            "type": "string",
+            "description": "The gait module id of the requested person"
+          },
+          "silhouette": {
+            "description": "The silhouette data provided by the gait module for the specific person",
+            "properties": {
+              "data": null,
+              "shape": { "type": "array", "items": { "type": "number" } },
+              "dtype": { "type": "string" }
+            }
+          }
+        }
+      },
+      "error400": {
+        "type": "object",
+        "required": ["status", "message"],
+        "properties": {
+          "status": { "type": "integer", "example": 400 },
+          "message": {
+            "type": "string",
+            "example": "Request not formatted properly"
+          }
+        }
+      },
+      "error401": {
+        "type": "object",
+        "required": ["status", "message"],
+        "properties": {
+          "status": { "type": "integer", "example": 401 },
+          "message": {
+            "type": "string",
+            "example": "Unauthorized to access this endpoint. Try to login again"
+          }
+        }
+      },
+      "error403": {
+        "type": "object",
+        "required": ["status", "message"],
+        "properties": {
+          "status": { "type": "integer", "example": 403 },
+          "message": {
+            "type": "string",
+            "example": "Forbidden: Your account type cannot access this endpoint"
+          }
+        }
+      },
+      "error404": {
+        "type": "object",
+        "required": ["status", "message"],
+        "properties": {
+          "status": { "type": "integer", "example": 404 },
+          "message": { "type": "string", "example": "Resource does not exist" }
+        }
+      },
+      "error500": {
+        "type": "object",
+        "required": ["status", "message"],
+        "properties": {
+          "status": { "type": "integer", "example": 500 },
+          "message": { "type": "string", "example": "Internal server error" }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "cases",
+      "description": "API that handles the generic CRUD operations of a case in the CMS"
+    },
+    {
+      "name": "use case 3",
+      "description": "API that handles the UC3 specific operations of a case in the CMS"
+    },
+    {
+      "name": "history",
+      "description": "API that handles closed (deleted, finalized) cases in the CMS"
+    }
+  ]
+}
