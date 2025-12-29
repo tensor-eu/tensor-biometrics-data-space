@@ -1,0 +1,94 @@
+version: "3.1"
+services:
+  ecc-consumer:
+    image: harbor.tensor.rid-intrasoft.eu/certh_registry/connector_ecc:latest
+    labels:
+      io.portainer.accesscontrol.teams: CERTH
+    networks:
+      - consumer
+      - ds-comps-voice-xai-server
+    container_name: ecc-consumer
+    ports:
+      - "${CONSUMER_PORT}:8449" #Port for exposing HTTP endpoints
+      - "8890:8889" #Exposed port for receiving data from another connector (REST)
+      - "8087:8086" #Exposed port for receiving data from another connector (WS)
+    environment:
+      - "JDK_JAVA_OPTIONS=-Xmx1024m"
+      - "SPRING_PROFILES_ACTIVE=docker"
+      - TENSOR_ENCRYPTOR_API=${TENSOR_ENCRYPTOR_API}
+      - TENSOR_DSP_API=${TENSOR_DSP_API}
+      - TENSOR_INDEXER_API=${TENSOR_INDEXER_API}
+      - DATA_APP_ENDPOINT=${CONSUMER_DATA_APP_ENDPOINT} #Data APP enpoint for consuming received data
+      - MULTIPART_EDGE=${CONSUMER_MULTIPART_EDGE} #Data APP endpoint multipart/mixed content type
+      - MULTIPART_ECC=${MULTIPART_ECC}
+      - CONNECTOR_ID=${CONSUMER_ISSUER_CONNECTOR_URI}
+      - IDSCP2=${IDSCP2}
+      - WS_EDGE=${CONSUMER_WS_EDGE}
+      - WS_ECC=${WS_ECC}
+      - UC_DATAAPP_URI=https://uc-dataapp-consumer:8080/platoontec/PlatoonDataUsage/1.0/
+      - BROKER_URL=${BROKER_URL}
+      - CACHE_TOKEN=${CACHE_TOKEN}
+      - FETCH_TOKEN_ON_STARTUP=${FETCH_TOKEN_ON_STARTUP}
+      - KEYSTORE_NAME=${KEYSTORE_NAME}
+      - KEY_PASSWORD=${KEY_PASSWORD}
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+      - ALIAS=${ALIAS}
+      - DAPS_KEYSTORE_NAME=${CONSUMER_DAPS_KEYSTORE_NAME}
+      - DAPS_KEYSTORE_PASSWORD=${CONSUMER_DAPS_KEYSTORE_PASSWORD}
+      - DAPS_KEYSTORE_ALIAS=${CONSUMER_DAPS_KEYSTORE_ALIAS}
+      - TRUSTORE_NAME=${TRUSTORE_NAME}
+      - TRUSTORE_PASSWORD=${TRUSTORE_PASSWORD}
+      - FIREWALL=${CONSUMER_ECC_FIREWALL}
+      - TZ=Europe/Rome
+      - AES256-SECRET-KEY=${AES_SECRET_KEY}
+    volumes:
+      - ./config/ecc_resources_consumer:/config
+      - ./cert/consumer:/cert
+      - ecc_consumer_data:/home/nobody/data/
+    extra_hosts:
+      - "ecc-consumer:172.17.0.1"
+
+  be-dataapp-consumer:
+    image: harbor.tensor.rid-intrasoft.eu/certh_registry/connector_be:latest
+    labels:
+      io.portainer.accesscontrol.teams: CERTH
+    restart: always
+    networks:
+      - consumer
+      - ds-comps-voice-xai-server
+    container_name: be-dataapp-consumer
+    ports:
+      - "8184:8183"
+    expose:
+      - "9000"
+    environment:
+      - "JDK_JAVA_OPTIONS=-Xmx1024m"
+      - "SPRING_PROFILES_ACTIVE=docker"
+      - DATA_APP_MULTIPART=${CONSUMER_MULTIPART_EDGE}
+      - KEYSTORE_NAME=${KEYSTORE_NAME}
+      - KEY_PASSWORD=${KEY_PASSWORD}
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+      - ALIAS=${ALIAS}
+      - ECC_HOSTNAME=ecc-consumer
+      - EXTRACT_PAYLOAD_FROM_RESPONSE=${EXTRACT_PAYLOAD_FROM_RESPONSE}
+      - ECC_PORT=8887
+      - TZ=Europe/Rome
+      - ISSUER_CONNECTOR_URI=${CONSUMER_ISSUER_CONNECTOR_URI}
+      - FIREWALL=${CONSUMER_DATA_APP_FIREWALL}
+      - VALIDATE_SELF_DESCRIPTION=${VALIDATE_SELF_DESCRIPTION}
+      - TENSOR_ENCRYPTOR_API=${TENSOR_ENCRYPTOR_API}
+      - TENSOR_DSP_API=${TENSOR_DSP_API}
+      - TENSOR_INDEXER_API=${TENSOR_INDEXER_API}
+    volumes:
+      - ./config/be-dataapp_resources:/config
+      - ./cert/consumer:/cert
+      - be_dataapp_consumer_data:/home/nobody/data
+
+networks:
+  consumer: {}
+  ds-comps-voice-xai-server:
+    external: true
+
+volumes:
+  ecc_consumer_data: {}
+  be_dataapp_consumer_data: {}
