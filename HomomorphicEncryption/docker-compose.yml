@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+  encryptor_dh_he:
+    build:
+      context: ./api/SEAL-Python
+    platform: linux/amd64
+    volumes:
+      - ..:/app
+    working_dir: /app/
+    command: >
+      bash -c "uvicorn combined_api_hamming:app --host 0.0.0.0 --port 8001 &
+               uvicorn combined_api_addition:app --host 0.0.0.0 --port 8003"

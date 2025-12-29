@@ -1,0 +1,9 @@
+.DS_Store
+/01_FE
+/02_HE
+/03_AES
+/deprecated
+
+# Ignore Python bytecode files
+**/__pycache__/
+*.pyc
