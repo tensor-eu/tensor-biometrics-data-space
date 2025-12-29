@@ -1,0 +1,8 @@
+Flask
+torch
+torchvision
+requests
+Flask-Cors
+tensorflow
+librosa
+python-dotenv
