@@ -141,10 +141,11 @@ The data exchange takes place under the secure configurations of the Data Space 
 
 ```json
 {
-    "multipart": "form",
-    "Forward-To": "https://{OWNER_CONNECTOR_IP}/data",
-    "messageType": "ArtifactRequestMessage",
-    "requestedArtifact": "Requested suspect profile ID (string)"
+  "multipart": "form",
+  "Forward-To": "https://{OWNER_CONNECTOR_IP}/data",
+  "messageType": "ArtifactRequestMessage",
+  "requestedArtifact": "Requested suspect profile ID (string)"
 }
----
 ```
+
+---
