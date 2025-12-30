@@ -1,4 +1,4 @@
-# Project Name
+# TENSOR
 
 **TENSOR**: Reliable biomeTric tEchNologies to asSist Police authorities in cOmbating terrorism and oRganized crime
 
